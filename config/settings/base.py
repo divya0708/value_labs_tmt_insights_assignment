@@ -16,7 +16,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -42,7 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'interview.core',
     'interview.inventory',
-    'interview.order'
+    'interview.order',
+    'interview.profiles',
 ]
 
 MIDDLEWARE = [
@@ -73,8 +75,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+AUTH_USER_MODEL = 'profiles.UserProfile'
 
+WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
