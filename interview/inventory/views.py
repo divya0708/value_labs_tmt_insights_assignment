@@ -6,11 +6,14 @@ from rest_framework.views import APIView
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
+from interview.inventory.pagination import InventoryLimitOffsetPagination
 
 
 class InventoryListCreateView(APIView):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
+    pagination_class = InventoryLimitOffsetPagination
+
     
     def post(self, request: Request, *args, **kwargs) -> Response:
         try:
@@ -28,9 +31,11 @@ class InventoryListCreateView(APIView):
         return Response(serializer.data, status=201)
     
     def get(self, request: Request, *args, **kwargs) -> Response:
-        serializer = self.serializer_class(self.get_queryset(), many=True)
-        
-        return Response(serializer.data, status=200)
+        queryset = self.get_queryset()
+        paginator = InventoryLimitOffsetPagination()
+        paginated_qs = paginator.paginate_queryset(queryset, request)
+        serializer = self.serializer_class(paginated_qs, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
     def get_queryset(self):
         return self.queryset.all()
