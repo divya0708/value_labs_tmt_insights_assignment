@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+from django.utils.dateparse import parse_date
 
 from interview.order.models import Order, OrderTag
 from interview.order.serializers import OrderSerializer, OrderTagSerializer
@@ -34,3 +36,23 @@ class DeactivateOrderView(APIView):
             {"detail": "Order deactivated successfully."},
             status=status.HTTP_200_OK
         )
+
+
+class OrderDateRangeListView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        start_date_str = self.request.query_params.get("start_date")
+        embargo_date_str = self.request.query_params.get("embargo_date")
+
+        if not start_date_str or not embargo_date_str:
+            raise ValidationError("start_date and embargo_date query parameters are required")
+        
+        start_date = parse_date(start_date_str)
+        embargo_date = parse_date(embargo_date_str)
+
+        if not start_date or not embargo_date:
+            raise ValidationError("Invalid date format. Use YYYY-MM-DD")
+        
+        # Filter orders where start_date >= provided start_date AND embargo_date <= provided embargo_date
+        return Order.objects.filter(start_date__gte=start_date, embargo_date__lte=embargo_date)
