@@ -1,3 +1,4 @@
+from django.utils.dateparse import parse_datetime
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -219,3 +220,19 @@ class InventoryTypeRetrieveUpdateDestroyView(APIView):
     
     def get_queryset(self, **kwargs):
         return self.queryset.get(**kwargs)
+
+
+class InventoryCreatedAfterListView(APIView):
+    serializer_class = InventorySerializer
+
+    def get(self, request: Request, *args, **kwags) -> Response:
+        created_after = request.query_params.get('created_after')
+        if not created_after:
+            return Response({'error': 'created_after query parameter is required'}, status=400)
+        
+        dt = parse_datetime(created_after)
+        if not dt:
+            return Response({'error': 'Invalid datetime format for created_after'}, status=400)
+        queryset = Inventory.objects.filter(created_at__gt=dt)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=200)
