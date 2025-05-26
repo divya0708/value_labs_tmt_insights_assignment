@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from interview.order.models import Order, OrderTag
-from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
+from interview.inventory.models import Inventory, InventoryLanguage, InventoryType
 
 
 class OrderDateRangeListViewTests(APITestCase):
@@ -16,7 +16,7 @@ class OrderDateRangeListViewTests(APITestCase):
         # Setup related models
         self.type = InventoryType.objects.create(name="Type1")
         self.language = InventoryLanguage.objects.create(name="English")
-        self.tag = OrderTag.objects.create(name="Tag1")  # <-- Use OrderTag here
+        self.tag = OrderTag.objects.create(name="Tag1")
 
         # Inventories
         self.inventory1 = Inventory.objects.create(
