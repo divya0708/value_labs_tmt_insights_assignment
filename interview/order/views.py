@@ -56,3 +56,11 @@ class OrderDateRangeListView(generics.ListAPIView):
         
         # Filter orders where start_date >= provided start_date AND embargo_date <= provided embargo_date
         return Order.objects.filter(start_date__gte=start_date, embargo_date__lte=embargo_date)
+    
+
+class OrderTagsListView(generics.ListAPIView):
+    serializer_class = OrderTagSerializer
+
+    def get_queryset(self):
+        order = get_object_or_404(Order, pk=self.kwargs["pk"])
+        return order.tags.all()
